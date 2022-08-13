@@ -1,2 +1,6 @@
 ---
-# handlers file for html_inventory
+
+- name: restart lighttpd
+  ansible.builtin.service:
+    name: lighttpd
+    state: restarted
