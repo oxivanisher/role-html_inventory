@@ -34,7 +34,7 @@
       - ansible-cmdb
     extra_args: --user
     executable: pip3
-  become: yes
+  become: true
   become_user: "{{ ansible_install_for_user }}"
 
 - name: ensuring html inventory creation script sudo permissions
@@ -60,14 +60,7 @@
     owner: root
     group: root
     mode: 0644
-  register: systemd_service_changed
-
-- name: reload systemd to read the new systemd service
-  ansible.builtin.systemd:
-    name: create-host-inventory.service
-    daemon_reload: true
-    state: restarted
-  when: systemd_service_changed.changed
+  notify: reload systemd to read the new systemd service
 
 - name: copy html inventory timer
   ansible.builtin.template:
@@ -76,14 +69,7 @@
     owner: root
     group: root
     mode: 0644
-  register: systemd_timer_changed
-
-- name: reload systemd to read the new systemd service
-  ansible.builtin.systemd:
-    name: create-host-inventory.timer
-    daemon_reload: true
-    state: restarted
-  when: systemd_timer_changed.changed
+  notify: reload systemd to read the new systemd service
 
 - name: enable html inventory timer
   ansible.builtin.systemd:
