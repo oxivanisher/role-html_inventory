@@ -1,0 +1,99 @@
+---
+
+- name: install lighttpd server
+  ansible.builtin.package:
+    name: lighttpd
+    state: present
+
+- name: ensure lighttpd is enabled
+  ansible.builtin.systemd:
+    name: lighttpd.service
+    state: started
+    enabled: yes
+
+- name: configure lighttpd
+  ansible.builtin.template:
+    src: lighttpd.conf.jinja2
+    dest: /etc/lighttpd/lighttpd.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart lighttpd
+
+- name: "ensuring script directory for {{ jump_host.user_name }}"
+  ansible.builtin.file:
+    path: "/home/{{ jump_host.user_name }}/scripts/"
+    state: directory
+    owner: "{{ jump_host.user_name }}"
+    group: "users"
+    mode: 0770
+
+- name: install ansible-cmdb pip module
+  ansible.builtin.pip:
+    name:
+      - ansible-cmdb
+    extra_args: --user
+    executable: pip3
+  become: yes
+  become_user: "{{ ansible_install_for_user }}"
+
+- name: ensuring html inventory creation script sudo permissions
+  ansible.builtin.template:
+    src: create-host-inventory.jinja2
+    dest: "/etc/sudoers.d/create-host-inventory"
+    owner: "root"
+    group: "root"
+    mode: 0640
+
+- name: ensuring html inventory creation script
+  ansible.builtin.template:
+    src: create-host-inventory.sh.jinja2
+    dest: "/home/{{ jump_host.user_name }}/scripts/create-host-inventory.sh"
+    owner: "{{ jump_host.user_name }}"
+    group: "users"
+    mode: 0755
+
+- name: copy html inventory service
+  ansible.builtin.template:
+    src: create-host-inventory.service.jinja2
+    dest: /etc/systemd/system/create-host-inventory.service
+    owner: root
+    group: root
+    mode: 0644
+  register: systemd_service_changed
+
+- name: reload systemd to read the new systemd service
+  ansible.builtin.systemd:
+    name: create-host-inventory.service
+    daemon_reload: yes
+    state: restarted
+  when: systemd_service_changed.changed
+
+- name: copy html inventory timer
+  ansible.builtin.template:
+    src: create-host-inventory.timer.jinja2
+    dest: /etc/systemd/system/create-host-inventory.timer
+    owner: root
+    group: root
+    mode: 0644
+  register: systemd_timer_changed
+
+- name: reload systemd to read the new systemd service
+  ansible.builtin.systemd:
+    name: create-host-inventory.timer
+    daemon_reload: yes
+    state: restarted
+  when: systemd_timer_changed.changed
+
+- name: enable html inventory timer
+  ansible.builtin.systemd:
+    name: create-host-inventory.timer
+    enabled: yes
+    state: started
+
+#- name: ensure python-requests
+#  ansible.builtin.package:
+#    name:
+#      - python3-requests
+#      - python3-yaml
+#    state: present
