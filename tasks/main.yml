@@ -9,7 +9,7 @@
   ansible.builtin.systemd:
     name: lighttpd.service
     state: started
-    enabled: yes
+    enabled: true
 
 - name: configure lighttpd
   ansible.builtin.template:
@@ -65,7 +65,7 @@
 - name: reload systemd to read the new systemd service
   ansible.builtin.systemd:
     name: create-host-inventory.service
-    daemon_reload: yes
+    daemon_reload: true
     state: restarted
   when: systemd_service_changed.changed
 
@@ -81,14 +81,14 @@
 - name: reload systemd to read the new systemd service
   ansible.builtin.systemd:
     name: create-host-inventory.timer
-    daemon_reload: yes
+    daemon_reload: true
     state: restarted
   when: systemd_timer_changed.changed
 
 - name: enable html inventory timer
   ansible.builtin.systemd:
     name: create-host-inventory.timer
-    enabled: yes
+    enabled: true
     state: started
 
 #- name: ensure python-requests
