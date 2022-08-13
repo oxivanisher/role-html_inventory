@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# {{ ansible_managed }}
+
+# creating facts dir
+mkdir -p /home/{{ jump_host.user_name }}/facts
+mkdir -p /home/{{ jump_host.user_name }}/inventory
+
+LOGNAME="/home/{{ jump_host.user_name }}/inventory/$(date +%Y%m%d-%H%M%S)_log.txt"
+REBOOTNAME="/home/{{ jump_host.user_name }}/inventory/$(date +%Y%m%d-%H%M%S)_rebootcheck.txt"
+HTTPFILE="/home/{{ jump_host.user_name }}/inventory/$(date +%Y%m%d-%H%M%S)_index.html"
+
+export ANSIBLE_LOG_PATH=/tmp/chatops_daily.txt
+export ANSIBLE_HOST_KEY_CHECKING=False
+export ANSIBLE_CACHE_PLUGIN_CONNECTION=/home/{{ jump_host.user_name }}/facts
+export ANSIBLE_CACHE_PLUGIN=jsonfile
+
+# compress old thing in inventory
+gzip /home/{{ jump_host.user_name }}/inventory/*_index.html
+gzip /home/{{ jump_host.user_name }}/inventory/*_log.txt
+gzip /home/{{ jump_host.user_name }}/inventory/*_rebootcheck.txt
+
+# removing old facts
+rm -rf /home/{{ jump_host.user_name }}/facts/*
+
+cd "/home/{{ jump_host.user_name }}/ansible/"
+
+# running ansible check on all hosts and saving the facts to local dir
+date > "$LOGNAME"
+/home/{{ jump_host.user_name }}/.local/bin/ansible-playbook site.yml --key-file /home/{{ jump_host.user_name }}/.ssh/{{ html_inventory_keyname }} --check 2>&1 | tee -a "$LOGNAME"
+# strip log to log.txt
+cat "$LOGNAME" | sudo tee /var/www/html/log.txt 1>/dev/null
+# copy full log
+sudo cp "$LOGNAME" /var/www/html/
+
+# call and save rebootcheck
+date > "$REBOOTNAME"
+/home/{{ jump_host.user_name }}/.local/bin/ansible-playbook site.yml --key-file /home/{{ jump_host.user_name }}/.ssh/{{ html_inventory_keyname }} --tags "rebootcheck" | grep "needs to be rebooted" | tee -a "$LOGNAME"
+# copy log to webdir
+cat "$REBOOTNAME" | sudo tee /var/www/html/rebootcheck.txt 1>/dev/null
+# copy full log
+sudo cp "$REBOOTNAME" /var/www/html/
+
+# creating ansible-cmdb overview
+# this is commented out until this is fixed: https://github.com/fboender/ansible-cmdb/pull/240
+# /usr/local/bin/ansible-cmdb -f /home/{{ jump_host.user_name }}/facts/ > "$HTTPFILE"
+/usr/bin/python3 /home/oxi/.local/lib/ansiblecmdb/ansible-cmdb.py -f /home/{{ jump_host.user_name }}/facts/ > "$HTTPFILE"
+cat "$HTTPFILE" | sudo tee /var/www/html/index.html 1>/dev/null
+
+# this is disabled tue to security reasons (if the /home/{{ jump_host.user_name }}/inventory var would be empty)
+# but if the files are stacking up like stupid, they could be cleaned like:
+# find /home/{{ jump_host.user_name }}/inventory -type f -mtime +90 -delete

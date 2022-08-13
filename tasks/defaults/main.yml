@@ -1,0 +1,4 @@
+---
+
+html_inventory_port: 8080
+html_inventory_keyname: id_rsa_html_inventory

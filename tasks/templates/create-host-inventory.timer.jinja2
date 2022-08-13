@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=Create HTML host inventory daily
+RefuseManualStart=no
+RefuseManualStop=no
+
+[Timer]
+Persistent=false
+OnCalendar=daily
+Unit=create-host-inventory.service
+
+[Install]
+WantedBy=timers.target
