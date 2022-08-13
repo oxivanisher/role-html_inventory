@@ -77,7 +77,7 @@
     enabled: true
     state: started
 
-#- name: ensure python-requests
+# - name: ensure python-requests
 #  ansible.builtin.package:
 #    name:
 #      - python3-requests
