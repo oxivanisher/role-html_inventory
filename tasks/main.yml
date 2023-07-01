@@ -6,6 +6,7 @@
   loop:
     - lighttpd
     - python3-full
+    - python3-virtualenv
 
 - name: Ensure lighttpd is enabled
   ansible.builtin.systemd:
