@@ -1,9 +1,11 @@
 ---
-
-- name: install lighttpd server
+- name: install lighttpd server and python requirements
   ansible.builtin.package:
-    name: lighttpd
+    name: "{{ item }}"
     state: present
+  loop:
+    - lighttpd
+    - python3-full
 
 - name: ensure lighttpd is enabled
   ansible.builtin.systemd:
@@ -31,11 +33,11 @@
 - name: install ansible-cmdb pip module
   ansible.builtin.pip:
     name:
+      - ansible
       - ansible-cmdb
-    extra_args: --user
-    executable: pip3
+    virtualenv: "/home/{{ jump_host.user_name }}/.local"
   become: true
-  become_user: "{{ ansible_install_for_user }}"
+  become_user: "{{ jump_host.user_name }}"
 
 - name: ensuring html inventory creation script sudo permissions
   ansible.builtin.template:
@@ -76,10 +78,3 @@
     name: create-host-inventory.timer
     enabled: true
     state: started
-
-# - name: ensure python-requests
-#  ansible.builtin.package:
-#    name:
-#      - python3-requests
-#      - python3-yaml
-#    state: present

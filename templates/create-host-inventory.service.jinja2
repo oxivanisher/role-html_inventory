@@ -8,7 +8,7 @@ Type=simple
 User={{ jump_host.user_name }}
 Group=users
 WorkingDirectory=/home/{{ jump_host.user_name }}/
-ExecStart=/home/{{ jump_host.user_name }}/scripts/create-host-inventory.sh
+ExecStart=/home/{{ jump_host.user_name }}/.local/bin/python3 /home/{{ jump_host.user_name }}/scripts/create-host-inventory.sh
 
 [Install]
 WantedBy=default.target
