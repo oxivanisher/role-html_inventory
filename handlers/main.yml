@@ -1,17 +1,16 @@
 ---
-
-- name: restart lighttpd
+- name: Restart lighttpd
   ansible.builtin.service:
     name: lighttpd
     state: restarted
 
-- name: reload systemd to read the new systemd service
+- name: Reload systemd to read the new systemd service
   ansible.builtin.systemd:
     name: create-host-inventory.service
     daemon_reload: true
     state: restarted
 
-- name: reload systemd to read the new systemd service
+- name: Reload systemd to read the new systemd service
   ansible.builtin.systemd:
     name: create-host-inventory.timer
     daemon_reload: true
