@@ -27,7 +27,9 @@ cd "/home/{{ jump_host.user_name }}/ansible/"
 
 # running ansible check on all hosts and saving the facts to local dir
 date > "$LOGNAME"
-/home/{{ jump_host.user_name }}/.local/bin/ansible-playbook site.yml --key-file /home/{{ jump_host.user_name }}/.ssh/{{
+ANSIBLE_DISPLAY_SKIPPED_HOSTS=false ANSIBLE_DISPLAY_OK_HOSTS=false /home/{{ jump_host.user_name
+}}/.local/bin/ansible-playbook {{ ansible_playbook_gatherfacts }} --key-file /home/{{
+jump_host.user_name }}/.ssh/{{
 html_inventory_keyname }} --check 2>&1 | tee -a "$LOGNAME"
 # strip log to log.txt
 cat "$LOGNAME" | sudo tee /var/www/html/log.txt 1>/dev/null
@@ -36,7 +38,8 @@ sudo cp "$LOGNAME" /var/www/html/
 
 # call and save rebootcheck
 date > "$REBOOTNAME"
-/home/{{ jump_host.user_name }}/.local/bin/ansible-playbook site.yml --key-file /home/{{ jump_host.user_name }}/.ssh/{{
+/home/{{ jump_host.user_name }}/.local/bin/ansible-playbook {{ ansible_playbook_rebootcheck }} --key-file /home/{{
+jump_host.user_name }}/.ssh/{{
 html_inventory_keyname }} --tags "rebootcheck" | grep "needs to be rebooted" | tee -a "$LOGNAME"
 # copy log to webdir
 cat "$REBOOTNAME" | sudo tee /var/www/html/rebootcheck.txt 1>/dev/null
