@@ -1,5 +1,5 @@
 ---
 html_inventory_port: 8080
-html_inventory_keyname: id_rsa_html_inventory
+html_inventory_keyname:
 ansible_playbook_gatherfacts: gather_facts.yml
 ansible_playbook_rebootcheck: upgrade.yml
