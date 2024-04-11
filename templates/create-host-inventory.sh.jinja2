@@ -43,8 +43,9 @@ sudo cp "$REBOOTNAME" /var/www/html/
 
 # creating ansible-cmdb overview
 # this is commented out until this is fixed: https://github.com/fboender/ansible-cmdb/pull/240
-# /usr/local/bin/ansible-cmdb -f {{ html_inventory_user_home }}/facts/ > "$HTTPFILE"
-{{ html_inventory_user_home }}/{{ html_inventory_venv_subdir }}/bin/python3 {{ html_inventory_user_home }}/{{ html_inventory_venv_subdir }}/lib/ansiblecmdb/ansible-cmdb.py -f {{ html_inventory_user_home }}/facts/ > "$HTTPFILE" cat "$HTTPFILE" | sudo tee /var/www/html/index.html 1>/dev/null
+# {{ html_inventory_user_home }}/{{ html_inventory_venv_subdir }}/bin/ansible-cmdb -f {{ html_inventory_user_home }}/facts/ > "$HTTPFILE"
+{{ html_inventory_user_home }}/{{ html_inventory_venv_subdir }}/bin/python3 {{ html_inventory_user_home }}/{{ html_inventory_venv_subdir }}/lib/ansiblecmdb/ansible-cmdb.py -f {{ html_inventory_user_home }}/facts/ > "$HTTPFILE"
+cat "$HTTPFILE" | sudo tee /var/www/html/index.html 1>/dev/null
 
 # this is disabled tue to security reasons (if the {{ html_inventory_user_home }}/inventory var would be empty)
 # but if the files are stacking up like stupid, they could be cleaned like:
