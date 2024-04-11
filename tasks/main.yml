@@ -23,22 +23,40 @@
     mode: "0644"
   notify: Restart lighttpd
 
-- name: "Ensuring script directory for {{ jump_host.user_name }}"
-  ansible.builtin.file:
-    path: "/home/{{ jump_host.user_name }}/scripts/"
-    state: directory
-    owner: "{{ jump_host.user_name }}"
-    group: "users"
-    mode: "0770"
-
 - name: Install ansible-cmdb pip module
   ansible.builtin.pip:
     name:
       - ansible
       - ansible-cmdb
-    virtualenv: "/home/{{ jump_host.user_name }}/.local"
+    # virtualenv: "{{ lookup('env', 'HOME') }}/.local"
+    virtualenv: "{{ lookup('env', 'HOME') }}/{{ html_inventory_venv_subdir }}"
   become: true
-  become_user: "{{ jump_host.user_name }}"
+  become_user: "{{ html_inventory_user_name }}"
+
+- name: Ensure ~/.local/bin/ exists
+  ansible.builtin.file:
+    path: "{{ lookup('env', 'HOME') }}/.local/bin/"
+    state: directory
+    owner: "{{ html_inventory_user_name }}"
+    group: "{{ html_inventory_user_name }}"
+    mode: "0770"
+  become: true
+  become_user: "{{ html_inventory_user_name }}"
+
+- name: Link some useful bind from venv to ~/.local/bin/
+  ansible.builtin.file:
+    src: "{{ lookup('env', 'HOME') }}/{{ html_inventory_venv_subdir }}/bin/{{ item }}"
+    dest: "{{ lookup('env', 'HOME') }}/.local/bin/{{ item }}"
+    state: link
+    owner: "{{ html_inventory_user_name }}"
+    group: "{{ html_inventory_user_name }}"
+    follow: false
+  loop:
+    - ansible
+    - ansible-cmdb
+  ignore_errors: "{{ ansible_check_mode }}"
+  become: true
+  become_user: "{{ ansible_userspace_user }}"
 
 - name: Ensuring html inventory creation script sudo permissions
   ansible.builtin.template:
@@ -47,14 +65,18 @@
     owner: "root"
     group: "root"
     mode: "0640"
+  become: true
+  become_user: root
 
 - name: Ensuring html inventory creation script
   ansible.builtin.template:
     src: create-host-inventory.sh.jinja2
-    dest: "/home/{{ jump_host.user_name }}/scripts/create-host-inventory.sh"
-    owner: "{{ jump_host.user_name }}"
-    group: "users"
-    mode: "0755"
+    dest: "/usr/local/bin/create-host-inventory.sh"
+    owner: "{{ html_inventory_user_name }}"
+    group: "{{ html_inventory_user_name }}"
+    mode: "0750"
+  become: true
+  become_user: root
 
 - name: Copy html inventory service
   ansible.builtin.template:
@@ -64,6 +86,8 @@
     group: root
     mode: "0644"
   notify: Reload systemd to read the new systemd service
+  become: true
+  become_user: root
 
 - name: Copy html inventory timer
   ansible.builtin.template:
@@ -73,9 +97,13 @@
     group: root
     mode: "0644"
   notify: Reload systemd to read the new systemd service
+  become: true
+  become_user: root
 
 - name: Enable html inventory timer
   ansible.builtin.systemd:
     name: create-host-inventory.timer
     enabled: true
     state: started
+  become: true
+  become_user: root

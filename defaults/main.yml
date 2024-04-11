@@ -1,5 +1,7 @@
 ---
+html_inventory_user_name: root
+html_inventory_venv_subdir: dev/ansible-venv
 html_inventory_port: 8080
-html_inventory_keyname:
-ansible_playbook_gatherfacts: gather_facts.yml
-ansible_playbook_rebootcheck: upgrade.yml
+html_inventory_ssh_key:
+html_inventory_gatherfacts_playbook: gather_facts.yml
+html_inventory_rebootcheck_playbook: upgrade.yml

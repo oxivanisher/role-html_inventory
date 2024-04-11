@@ -5,10 +5,10 @@ Description=Create HTML host inventory
 
 [Service]
 Type=simple
-User={{ jump_host.user_name }}
+User={{ html_inventory_user_name }}
 Group=users
-WorkingDirectory=/home/{{ jump_host.user_name }}/
-ExecStart=/home/{{ jump_host.user_name }}/scripts/create-host-inventory.sh
+WorkingDirectory=/home/{{ html_inventory_user_name }}
+ExecStart=/usr/local/bin/create-host-inventory.sh
 
 [Install]
 WantedBy=default.target
