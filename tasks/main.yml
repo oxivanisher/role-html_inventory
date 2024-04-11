@@ -1,18 +1,21 @@
 ---
 - name: Install lighttpd server and python requirements
   ansible.builtin.package:
-    name: "{{ item }}"
+    name:
+      - lighttpd
+      - python3-full
+      - python3-virtualenv
     state: present
-  loop:
-    - lighttpd
-    - python3-full
-    - python3-virtualenv
+  become: true
+  become_user: root
 
 - name: Ensure lighttpd is enabled
   ansible.builtin.systemd:
     name: lighttpd.service
     state: started
     enabled: true
+  become: true
+  become_user: root
 
 - name: Configure lighttpd
   ansible.builtin.template:
@@ -22,12 +25,16 @@
     group: root
     mode: "0644"
   notify: Restart lighttpd
+  become: true
+  become_user: root
 
 - name: Ensure the html inventory user exists
   ansible.builtin.user:
     name: "{{ html_inventory_user_name }}"
     createhome: true
     state: present
+  become: true
+  become_user: root
 
 - name: Get home directory of html inventory user
   ansible.builtin.getent:

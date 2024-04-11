@@ -3,15 +3,21 @@
   ansible.builtin.service:
     name: lighttpd
     state: restarted
+  become: true
+  become_user: root
 
 - name: Reload systemd to read the new systemd service
   ansible.builtin.systemd:
     name: create-host-inventory.service
     daemon_reload: true
     state: restarted
+  become: true
+  become_user: root
 
 - name: Reload systemd to read the new systemd service
   ansible.builtin.systemd:
     name: create-host-inventory.timer
     daemon_reload: true
     state: restarted
+  become: true
+  become_user: root
