@@ -7,7 +7,6 @@ Notes
 -----
 
 * If you use the `oxivanisher.ansible_userspace` role, there are several similarities which is ideal to use the same user for both tasks.
-* The user needs its home to be in `/home` or the templated file `/usr/local/bin/create-host-inventory.sh` will be wrong. This is a known problem and might be fixed sometime ... or not.
 
 Requirements
 ------------

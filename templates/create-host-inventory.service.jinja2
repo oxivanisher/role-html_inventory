@@ -7,7 +7,7 @@ Description=Create HTML host inventory
 Type=simple
 User={{ html_inventory_user_name }}
 Group=users
-WorkingDirectory=/home/{{ html_inventory_user_name }}
+WorkingDirectory={{ html_inventory_user_home }}
 ExecStart=/usr/local/bin/create-host-inventory.sh
 
 [Install]

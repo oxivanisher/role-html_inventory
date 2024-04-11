@@ -23,19 +23,34 @@
     mode: "0644"
   notify: Restart lighttpd
 
+- name: Ensure the html inventory user exists
+  ansible.builtin.user:
+    name: "{{ html_inventory_user_name }}"
+    createhome: true
+    state: present
+
+- name: Get home directory of html inventory user
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ html_inventory_user_name }}"
+
+- name: Set home directory var for html inventory user
+  ansible.builtin.set_fact:
+    html_inventory_user_home: "{{ getent_passwd[html_inventory_user_name][4] }}"
+
 - name: Install ansible-cmdb pip module
   ansible.builtin.pip:
     name:
       - ansible
       - ansible-cmdb
     # virtualenv: "{{ lookup('env', 'HOME') }}/.local"
-    virtualenv: "{{ lookup('env', 'HOME') }}/{{ html_inventory_venv_subdir }}"
+    virtualenv: "{{ html_inventory_user_home }}/{{ html_inventory_venv_subdir }}"
   become: true
   become_user: "{{ html_inventory_user_name }}"
 
 - name: Ensure ~/.local/bin/ exists
   ansible.builtin.file:
-    path: "{{ lookup('env', 'HOME') }}/.local/bin/"
+    path: "{{ html_inventory_user_home }}/.local/bin/"
     state: directory
     owner: "{{ html_inventory_user_name }}"
     group: "{{ html_inventory_user_name }}"
@@ -45,8 +60,8 @@
 
 - name: Link some useful bind from venv to ~/.local/bin/
   ansible.builtin.file:
-    src: "{{ lookup('env', 'HOME') }}/{{ html_inventory_venv_subdir }}/bin/{{ item }}"
-    dest: "{{ lookup('env', 'HOME') }}/.local/bin/{{ item }}"
+    src: "{{ html_inventory_user_home }}/{{ html_inventory_venv_subdir }}/bin/{{ item }}"
+    dest: "{{ html_inventory_user_home }}/.local/bin/{{ item }}"
     state: link
     owner: "{{ html_inventory_user_name }}"
     group: "{{ html_inventory_user_name }}"
