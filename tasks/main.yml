@@ -56,7 +56,7 @@
     - ansible-cmdb
   ignore_errors: "{{ ansible_check_mode }}"
   become: true
-  become_user: "{{ ansible_userspace_user }}"
+  become_user: "{{ html_inventory_user_name }}"
 
 - name: Ensuring html inventory creation script sudo permissions
   ansible.builtin.template:
