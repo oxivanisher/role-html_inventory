@@ -27,7 +27,7 @@ cd "/home/{{ html_inventory_user_name }}/ansible/"
 
 # running ansible check on all hosts and saving the facts to local dir
 date > "$LOGNAME"
-ANSIBLE_DISPLAY_SKIPPED_HOSTS=false ANSIBLE_DISPLAY_OK_HOSTS=false /home/{{ html_inventory_user_name }}/{{ html_inventory_venv_subdir }}/bin/ansible-playbook {{ html_inventory_gatherfacts_playbook }} --key-file /home/{{ jump_host.user_name }}/.ssh/{{ html_inventory_ssh_key }} --check 2>&1 | tee -a "$LOGNAME"
+ANSIBLE_DISPLAY_SKIPPED_HOSTS=false ANSIBLE_DISPLAY_OK_HOSTS=false /home/{{ html_inventory_user_name }}/{{ html_inventory_venv_subdir }}/bin/ansible-playbook {{ html_inventory_gatherfacts_playbook }} --key-file /home/{{ html_inventory_user_name }}/.ssh/{{ html_inventory_ssh_key }} --check 2>&1 | tee -a "$LOGNAME"
 # strip log to log.txt
 cat "$LOGNAME" | sudo tee /var/www/html/log.txt 1>/dev/null
 # copy full log
