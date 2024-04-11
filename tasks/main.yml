@@ -43,7 +43,6 @@
     name:
       - ansible
       - ansible-cmdb
-    # virtualenv: "{{ lookup('env', 'HOME') }}/.local"
     virtualenv: "{{ html_inventory_user_home }}/{{ html_inventory_venv_subdir }}"
   become: true
   become_user: "{{ html_inventory_user_name }}"
