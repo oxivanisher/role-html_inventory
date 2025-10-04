@@ -7,6 +7,7 @@ This role confgures a Python virtual environment for Ansible in a users home.
 Notes
 -----
 
+* This is currently broken on debian trixie systems because of: https://github.com/fboender/ansible-cmdb/issues/259
 * If you use the `oxivanisher.ansible_userspace` role, there are several similarities which is ideal to use the same user for both tasks.
 
 Requirements
@@ -18,7 +19,7 @@ Role Variables
 --------------
 
 | Name                                | Comment                                                                              | Default value      |
-|-------------------------------------|--------------------------------------------------------------------------------------|--------------------|
+| ----------------------------------- | ------------------------------------------------------------------------------------ | ------------------ |
 | html_inventory_user_name            | Which user will be used to create the html inventory                                 | `root`             |
 | html_inventory_venv_subdir          | Which subdirectory in the users home will be used for the python virtual environment | `dev/ansible-venv` |
 | html_inventory_port                 | The port on which lighttpd will be configured to run on                              | `8080`             |
