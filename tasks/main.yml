@@ -36,22 +36,15 @@
   become: true
   become_user: root
 
-- name: Get home directory of html inventory user
+- name: Gather html_inventory_user_name user infos
   ansible.builtin.getent:
     database: passwd
     key: "{{ html_inventory_user_name }}"
-  ignore_errors: "{{ ansible_check_mode }}"
 
-- name: Set home directory var for html inventory user
+- name: Lookup home and group for html_inventory_user_name
   ansible.builtin.set_fact:
+    html_inventory_user_group: "{{ getent_passwd[html_inventory_user_name][2] }}"
     html_inventory_user_home: "{{ getent_passwd[html_inventory_user_name][4] }}"
-  ignore_errors: "{{ ansible_check_mode }}"
-
-- name: Lookup user home and group
-  ansible.builtin.set_fact:
-    html_inventory_user_group: "{{ lookup('pipe', 'id -gn') }}"
-  become: true
-  become_user: "{{ html_inventory_user_name }}"
 
 - name: Install ansible-cmdb pip module
   ansible.builtin.pip:
