@@ -36,9 +36,19 @@
   become: true
   become_user: root
 
+- name: Get home directory of html inventory user
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ html_inventory_user_name }}"
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Set home directory var for html inventory user
+  ansible.builtin.set_fact:
+    html_inventory_user_home: "{{ getent_passwd[html_inventory_user_name][4] }}"
+  ignore_errors: "{{ ansible_check_mode }}"
+
 - name: Lookup user home and group
   ansible.builtin.set_fact:
-    html_inventory_user_home: "{{ lookup('env', 'HOME') }}"
     html_inventory_user_group: "{{ lookup('pipe', 'id -gn') }}"
   become: true
   become_user: "{{ html_inventory_user_name }}"
