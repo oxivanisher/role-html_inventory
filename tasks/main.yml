@@ -44,8 +44,8 @@
 
 - name: Lookup home and group for html_inventory_user_name
   ansible.builtin.set_fact:
-    html_inventory_user_group: "{{ getent_passwd[html_inventory_user_name][2] }}"
-    html_inventory_user_home: "{{ getent_passwd[html_inventory_user_name][4] }}"
+    html_inventory_user_group: "{{ ansible_facts.getent_passwd[html_inventory_user_name][2] }}"
+    html_inventory_user_home: "{{ ansible_facts.getent_passwd[html_inventory_user_name][4] }}"
 
 - name: Install ansible-cmdb pip module
   ansible.builtin.pip:
