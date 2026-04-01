@@ -8,7 +8,6 @@
       - python3-packaging
     state: present
   become: true
-  become_user: root
 
 - name: Ensure lighttpd is enabled
   ansible.builtin.systemd:
@@ -16,7 +15,6 @@
     state: started
     enabled: true
   become: true
-  become_user: root
 
 - name: Configure lighttpd
   ansible.builtin.template:
@@ -27,7 +25,6 @@
     mode: "0644"
   notify: Restart lighttpd
   become: true
-  become_user: root
 
 - name: Ensure the html inventory user exists
   ansible.builtin.user:
@@ -35,7 +32,6 @@
     createhome: true
     state: present
   become: true
-  become_user: root
 
 - name: Gather html_inventory_user_name user infos
   ansible.builtin.getent:
@@ -90,7 +86,6 @@
     mode: "0640"
     validate: /usr/sbin/visudo -cf %s
   become: true
-  become_user: root
 
 - name: Ensuring html inventory creation script
   ansible.builtin.template:
@@ -100,7 +95,6 @@
     group: "{{ html_inventory_user_group }}"
     mode: "0750"
   become: true
-  become_user: root
 
 - name: Copy html inventory service
   ansible.builtin.template:
@@ -111,7 +105,6 @@
     mode: "0644"
   notify: Reload systemd to read the new systemd service
   become: true
-  become_user: root
 
 - name: Copy html inventory timer
   ansible.builtin.template:
@@ -122,7 +115,6 @@
     mode: "0644"
   notify: Reload systemd to read the new systemd service
   become: true
-  become_user: root
 
 - name: Enable html inventory timer
   ansible.builtin.systemd:
@@ -130,4 +122,3 @@
     enabled: true
     state: started
   become: true
-  become_user: root
